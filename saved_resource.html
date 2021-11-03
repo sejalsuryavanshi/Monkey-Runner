@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<!-- saved from url=(0012)about:srcdoc -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.sound.min.js" crossorigin=""></script>
+<script src="https://assets.editor.p5js.org/5f435a483ca92000246d439c/5adcbe74-3a2a-4bc7-99ce-fe49b21c5e92.js" crossorigin=""></script>
+    
+    
+
+  <!--<base href="https://editor.p5js.org/amit.surya5782/sketches/BO8refBez/">--><base href="."><style>
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+</style><script src="https://editor.p5js.org/previewScripts.js"></script><style data-emotion=""></style><script>
+    function getScriptOff(line) {
+      var offs = [[72,"sketch"]];
+      var l = 0;
+      var file = '';
+      for (var i=0; i<offs.length; i++) {
+        var n = offs[i][0];
+        if (n < line && n > l) {
+          l = n;
+          file = offs[i][1];
+        }
+      }
+      return [line - l, file];
+    }
+    // catch reference errors, via http://stackoverflow.com/a/12747364/2994108
+    window.onerror = function (msg, url, lineNumber, columnNo, error) {
+        var string = msg.toLowerCase();
+        var substring = "script error";
+        var data = {};
+        if (url.match(/^(http:\/\/|https:\/\/)/) !== null && error.stack){
+          var errorNum = error.stack.split('about:srcdoc:')[1].split(':')[0];
+          var fileInfo = getScriptOff(errorNum);
+          data = msg + ' (' + fileInfo[1] + ': line ' + fileInfo[0] + ')';
+        } else {
+          var fileInfo = getScriptOff(lineNumber);
+          data = msg + ' (' + fileInfo[1] + ': line ' + fileInfo[0] + ')';
+        }
+        window.parent.postMessage([{
+          log: [{
+            method: 'error',
+            data: [data],
+            id: Date.now().toString()
+          }],
+          source: fileInfo[1]
+        }], '*');
+      return false;
+    };
+    // catch rejected promises
+    window.onunhandledrejection = function (event) {
+      if (event.reason && event.reason.message && event.reason.stack){
+        var errorNum = event.reason.stack.split('about:srcdoc:')[1].split(':')[0];
+        var fileInfo = getScriptOff(errorNum);
+        var data = event.reason.message + ' (' + fileInfo[1] + ': line ' + fileInfo[0] + ')';
+        window.parent.postMessage([{
+          log: [{
+            method: 'error',
+            data: [data],
+            id: Date.now().toString()
+          }],
+          source: fileInfo[1]
+        }], '*');
+      }
+    };
+  </script></head>
+  <body>
+      <script data-tag="@fs-sketch.js">var sword,swordImage,enemy1,enemy2,fruit1,fruit2,fruit3,fruit4,fruit,gameOver;
+var score=0;
+var end=0;
+var play=1;
+var gameState=1;
+var knifeSwooshSound,gameOverSound;   
+
+function preload(){
+  
+ fruit1Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/23a10fa0-9981-4d4b-ba1b-5eb1f35c1873.png");
+ fruit2Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/3f069428-92b8-4c28-bc04-14bda47e8d8f.png");
+ fruit3Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/108bde39-3f06-499f-9aac-451d292a3cd0.png");
+ fruit4Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/16cece25-04a6-46de-bb43-66596c301a14.png");
+ swordImage=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/84d6a558-2f1c-4f74-9e91-e87e88356753.png");
+ enemy1Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/0761dcba-78ee-461b-a16d-e551975dff14.png");
+ enemy2Image=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/31643500-f53f-4fa6-b611-d175104b7bb7.png");
+  gameOverImage=loadImage("https://assets.editor.p5js.org/5f435a483ca92000246d439c/8363cd29-6c72-42d6-af5b-82200ceb81c6.png");
+  
+   knifeSwooshSound=loadSound("https://assets.editor.p5js.org/5f435a483ca92000246d439c/c234b2e8-8f81-4ff5-a6e6-23b503df74d4.mp3");
+   gameOverSound=loadSound("https://assets.editor.p5js.org/5f435a483ca92000246d439c/a2349919-82d7-472a-aa1b-5a0c67e8c3e8.mp3");
+  
+}
+
+function setup(){
+createCanvas(600,600);
+  
+  
+ sword=createSprite(540,300,10,10);
+ sword.addImage(swordImage);
+
+  gameOver=createSprite(300,300,10,10);
+ gameOver.addImage(gameOverImage);
+  gameOver.visible=false;
+  
+  fruitGroup=new Group();
+  enemyGroup=new Group();
+  positionGroup=new Group();
+
+}
+
+function draw(){
+background("lightblue")
+  
+
+  
+  if(gameState===play){
+ sword.y=World.mouseY;
+ sword.x=World.mouseX;
+ 
+  fruits();
+  enemies();
+  
+    
+   if(fruitGroup.isTouching(sword)){
+     fruitGroup.destroyEach();
+     score=score+2;
+     
+     knifeSwooshSound.play();
+   }
+    
+     if(enemyGroup.isTouching(sword)){
+      enemyGroup.destroyEach();
+      fruitGroup.destroyEach();
+      sword.destroy();
+      gameState=end ;
+      gameOverSound.play();
+     gameOver.visible=true;
+     gameOver.scale=1.4; 
+      
+    }
+
+    
+    
+  }  
+  
+  
+  
+  
+
+    
+  sword.debug=false;
+  sword.setCollider("circle",0,0,50);
+  
+  drawSprites();
+  
+  fill("black");
+  text("score:"+score,300,15);
+}
+
+function fruits(){
+  
+ if(World.frameCount%80===0){
+    fruit=createSprite(600,200,60,60);
+    fruit.scale=0.2;
+    
+    r=Math.round(random(1,4));
+   if(r==1){
+    fruit.addImage(fruit1Image);
+   }else if(r==2){
+    fruit.addImage(fruit2Image);
+  }else if(r==3){
+    fruit.addImage(fruit3Image);
+   }else if(r==4){
+   fruit.addImage(fruit4Image);
+  }
+  
+ fruit.y=Math.round(random(50,340));
+    fruit.velocityX=-7-2*score/4;
+    fruit.setLifetime=100;
+    
+   fruitGroup.add(fruit);
+   
+   position=Math.round(random(1,2));
+  fruit=createSprite(400,200,60,60);
+  
+  if(position==1){
+    fruit.x=600;
+    fruit.velocityX=-(7+(score/4));
+  }
+else if(position==2){
+  fruit.x=0;
+  fruit.velocityX=(7+(score/4));
+}
+}
+}
+
+function enemies(){
+  
+   if(World.frameCount%200===0){
+    monster=createSprite(600,200,60,60);
+    monster.scale=0.9;
+     
+     monster.addAnimation("moving",enemy1Image); 
+     monster.y=Math.round(random(100,300));
+     monster.velocityX=-8-3*score/10;
+     monster.setLifetime=50;
+     
+     enemyGroup.add(monster);
+   }
+
+}
+
+
+
+
+
+
+</script>
+  
+
+<canvas id="defaultCanvas0" class="p5Canvas" width="600" height="600" style="width: 600px; height: 600px;"></canvas></body></html>
